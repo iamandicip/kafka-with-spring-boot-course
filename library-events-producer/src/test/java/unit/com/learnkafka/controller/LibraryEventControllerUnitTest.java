@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -78,6 +79,58 @@ public class LibraryEventControllerUnitTest {
         // expect
         mockMvc.perform(
                         post("/v1/libraryevent")
+                                .content(objectMapper.writeValueAsString(libraryEvent))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().string(expectedErrorMessage));
+    }
+
+    @Test
+    void updateLibraryEvent() throws Exception {
+        // given
+        Book book = Book.builder()
+                .bookId(123)
+                .bookAuthor("Ciprian")
+                .bookName("Kafka using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(456)
+                .book(book)
+                .libraryEventType(LibraryEventType.UPDATE)
+                .build();
+
+        when(libraryEventProducer.sendLibraryEventApproach2(isA(LibraryEvent.class))).thenReturn(null);
+
+        // expect
+        mockMvc.perform(
+                        put("/v1/libraryevent")
+                                .content(objectMapper.writeValueAsString(libraryEvent))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    void updateLibraryEvent_withNullLibraryEventId() throws Exception {
+        // given
+        Book book = Book.builder()
+                .bookId(123)
+                .bookAuthor("Ciprian")
+                .bookName("Kafka using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(null)
+                .book(book)
+                .build();
+
+        when(libraryEventProducer.sendLibraryEventApproach2(isA(LibraryEvent.class))).thenReturn(null);
+
+        String expectedErrorMessage = "Please pass the library event id";
+
+        // expect
+        mockMvc.perform(
+                        put("/v1/libraryevent")
                                 .content(objectMapper.writeValueAsString(libraryEvent))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())

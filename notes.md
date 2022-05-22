@@ -5,6 +5,8 @@
 - **Producers** produce events via Brokers - they use the *ProducerAPI*
 - **Consumers** consume events via Brokers - they use the *ConsumerAPI*
 
+[Learn - documentation](https://docs.spring.io/spring-kafka/docs/current/reference/html/)
+
 ## Kafka Broker
 
 Uses *ConnectAPI*
@@ -56,3 +58,16 @@ We can have multiple consumers with the same `group_id`, reading from different 
 A consumer is single-threaded.
 
 Kafka Broker manages consumer groups.
+
+## Kafka Producer configurations
+- acks
+  - acks = 0, 1 and all
+  - acks = 1 -> guarantees message is written to a leader (default)
+  - acks = all -> guarantees message is written to a leader and all replicas
+  - acks = 0 -> no guarantee (not recommended)
+- retries
+  - Integer value = [0 - 2147483647]
+  - in Spring Kafka, the default value is the max of this interval
+- retry.backoff.ms
+  - default is 100 ms
+- [Full Producer config](https://kafka.apache.org/documentation/#producerconfigs)

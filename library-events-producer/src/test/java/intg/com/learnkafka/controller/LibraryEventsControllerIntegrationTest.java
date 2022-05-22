@@ -95,4 +95,75 @@ public class LibraryEventsControllerIntegrationTest {
         String value = consumerRecord.value();
         assertEquals(expectedRecord, value);
     }
+
+    @Test
+    @Timeout(5)
+    void putLibraryEventWithId() {
+        // given
+        Book book = Book.builder()
+                .bookId(123)
+                .bookAuthor("Ciprian")
+                .bookName("Kafka using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(456)
+                .book(book)
+                .libraryEventType(LibraryEventType.NEW)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("content-type", MediaType.APPLICATION_JSON.toString());
+
+        HttpEntity<LibraryEvent> request = new HttpEntity<>(libraryEvent, headers);
+
+        // when
+        ResponseEntity<LibraryEvent> responseEntity = restTemplate.exchange(
+                "/v1/libraryevent",
+                HttpMethod.PUT,
+                request,
+                LibraryEvent.class);
+
+        // then
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        ConsumerRecord<Integer, String> consumerRecord = KafkaTestUtils.getSingleRecord(consumer, "library-events");
+        String expectedRecord = "{\"libraryEventId\":456,\"book\":{\"bookId\":123,\"bookName\":\"Kafka using Spring Boot\",\"bookAuthor\":\"Ciprian\"},\"libraryEventType\":\"UPDATE\"}";
+        String value = consumerRecord.value();
+        assertEquals(expectedRecord, value);
+    }
+
+    @Test
+    @Timeout(5)
+    void putLibraryEventWithoutId() {
+        // given
+        Book book = Book.builder()
+                .bookId(123)
+                .bookAuthor("Ciprian")
+                .bookName("Kafka using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(null)
+                .book(book)
+                .libraryEventType(LibraryEventType.NEW)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("content-type", MediaType.APPLICATION_JSON.toString());
+
+        HttpEntity<LibraryEvent> request = new HttpEntity<>(libraryEvent, headers);
+
+        // when
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+                "/v1/libraryevent",
+                HttpMethod.PUT,
+                request,
+                String.class);
+
+        // then
+        String expectedMessage = "Please pass the library event id";
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(expectedMessage, responseEntity.getBody());
+    }
 }
