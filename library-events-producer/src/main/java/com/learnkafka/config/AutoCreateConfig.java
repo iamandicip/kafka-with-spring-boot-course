@@ -17,4 +17,20 @@ public class AutoCreateConfig {
                 .replicas(3)
                 .build();
     }
+
+    @Bean
+    public NewTopic libraryEventsRetry() {
+        return TopicBuilder.name("library-events.RETRY")
+                .partitions(3)
+                .replicas(3)
+                .build();
+    }
+
+    @Bean
+    public NewTopic libraryEventsDlt() {
+        return TopicBuilder.name("library-events.DLT")
+                .partitions(3)
+                .replicas(3)
+                .build();
+    }
 }

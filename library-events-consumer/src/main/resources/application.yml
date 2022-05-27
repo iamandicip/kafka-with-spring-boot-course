@@ -4,6 +4,10 @@ spring:
 server:
   port: 8081
 
+topics:
+  retry: "library-events.RETRY"
+  dlt: "library-events.DLT"
+
 ---
 
 spring:
@@ -15,8 +19,8 @@ spring:
       default-topic: library-events
     consumer:
       bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
-      key-serializer: org.apache.kafka.common.serialization.IntegerDeserializer
-      value-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: library-events-listener-group
     producer:
       bootstrap.servers:
