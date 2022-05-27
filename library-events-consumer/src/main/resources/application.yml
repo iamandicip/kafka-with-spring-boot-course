@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active: nonprod
 server:
   port: 8081
 
@@ -45,8 +45,34 @@ spring:
     activate:
       on-profile: nonprod
   kafka:
+    template:
+      default-topic: library-events
     consumer:
-      bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
-      key-serializer: org.apache.kafka.common.serialization.IntegerDeserializer
-      value-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      bootstrap-servers: localhost:9095, localhost:9096, localhost:9097
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: library-events-listener-group
+      ssl:
+        trust-store-location: file:/home/ciprian/Dev/github/kafka-with-spring-boot-course/ssl/client.truststore.jks
+        trust-store-password: Gigixxx1
+        key-store-location: fiLe:/home/ciprian/Dev/github/kafka-with-spring-boot-course/ssl/client.keystore.jks
+        key-store-password: Gigixxx1
+    producer:
+      bootstrap.servers:
+        - localhost:9095, localhost:9096, localhost:9097
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    properties:
+      security:
+        protocol: SSL
+      ssl.endpoint.identification.algorithm:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+  h2:
+    console:
+      enabled: true
